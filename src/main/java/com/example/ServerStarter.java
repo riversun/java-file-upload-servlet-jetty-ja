@@ -20,7 +20,7 @@ public class ServerStarter {
     public static void main(String[] args) {
 
         final int MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024;
-        final int PORT = 8080;
+        final int PORT = 8081;
 
         final ServletContextHandler servletHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletHandler.setMaxFormContentSize(MAX_UPLOAD_SIZE_BYTES);

@@ -18,65 +18,77 @@ import javax.servlet.http.Part;
  */
 @SuppressWarnings("serial")
 public class UploadServlet extends HttpServlet {
+  @Override
+  public void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    // For CORS PreFlight Access for Ajax Upload request
+    resp.addHeader("Access-Control-Allow-Origin", "*");
+    resp.addHeader("Access-Control-Allow-Headers", "*");
 
-        // 簡易的なログ
-        final StringBuilder log = new StringBuilder();
-        log.append("----サーバーで受信----").append("\n");
+  }
 
-        try {
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-            final Collection<Part> parts = req.getParts();
+    // For CORS PreFlight Access for Ajax Upload request
+    resp.addHeader("Access-Control-Allow-Origin", "*");
+    resp.addHeader("Access-Control-Allow-Headers", "*");
 
-            for (Part part : parts) {
+    // 簡易的なログ
+    final StringBuilder log = new StringBuilder();
+    log.append("----サーバーで受信----").append("\n");
 
-                final String contentType = part.getContentType();
-                final String paramName = part.getName();
+    try {
 
-                if (contentType == null) {
-                    // テキストパートの処理
-                    // (contentTypeがnullなら、ファイルではない)
+      final Collection<Part> parts = req.getParts();
 
-                    final String paramValue = req.getParameter(paramName);
-                    log.append("paramName=").append(paramName).append(" paramValue=").append(paramValue).append("\n");
+      for (Part part : parts) {
 
-                } else {
+        final String contentType = part.getContentType();
+        final String paramName = part.getName();
 
-                    // ファイルパートの処理
-                    final String fileName = part.getSubmittedFileName();
+        if (contentType == null) {
+          // テキストパートの処理
+          // (contentTypeがnullなら、ファイルではない)
 
-                    final long fileSize = part.getSize();
-                    log.append("paramName=").append(paramName).append(" contentType=").append(contentType)
-                            .append(" fileName=").append(fileName).append(" fileSize=").append(fileSize).append("\n");
+          final String paramValue = req.getParameter(paramName);
+          log.append("paramName=").append(paramName).append(" paramValue=").append(paramValue).append("\n");
 
-                    if (fileSize > 0) {
+        } else {
 
-                        // アップロードされたファイルを保存する（その１ Part#writeメソッドをつかう）
-                        // MultipartConfigElementで指定されたディレクトリに保存される
-                        // part.write(fileName);
+          // ファイルパートの処理
+          final String fileName = part.getSubmittedFileName();
 
-                        // アップロードされたファイルを保存する（その２ ストリームをつかう）
-                        // byte[] data = new byte[(int) fileSize];
-                        // part.getInputStream().read(data);
-                        // Files.copy(part.getInputStream(), new File("c:/temp/" + fileName).toPath());
-                    }
-                }
-            }
+          final long fileSize = part.getSize();
+          log.append("paramName=").append(paramName).append(" contentType=").append(contentType)
+              .append(" fileName=").append(fileName).append(" fileSize=").append(fileSize).append("\n");
 
-            System.out.println(log.toString());
+          if (fileSize > 0) {
 
-            resp.setStatus(HttpServletResponse.SC_OK);
+            // アップロードされたファイルを保存する（その１ Part#writeメソッドをつかう）
+            // MultipartConfigElementで指定されたディレクトリに保存される
+            // part.write(fileName);
 
-            // ログをJSONにして、レスポンスを返す
-            final PrintWriter out = resp.getWriter();
-            out.println("{\"msg\":\"" + log.toString().replace("\n", "\\n") + "\"}");
-            out.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            // アップロードされたファイルを保存する（その２ ストリームをつかう）
+            // byte[] data = new byte[(int) fileSize];
+            // part.getInputStream().read(data);
+            // Files.copy(part.getInputStream(), new File("c:/temp/" + fileName).toPath());
+          }
         }
+      }
+
+      System.out.println(log.toString());
+
+      resp.setStatus(HttpServletResponse.SC_OK);
+
+      // ログをJSONにして、レスポンスを返す
+      final PrintWriter out = resp.getWriter();
+      out.println("{\"msg\":\"" + log.toString().replace("\n", "\\n") + "\"}");
+      out.close();
+
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+  }
 
 }
